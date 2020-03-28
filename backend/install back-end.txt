@@ -11,3 +11,5 @@ Em seu package, adicionar scripts e dentro um objeto chamado dev com valor node 
 ->yarn add mongoose
 
 ->yarn add multer
+
+Para validação, pode ser usado para celebrate

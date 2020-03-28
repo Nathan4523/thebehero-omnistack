@@ -2,6 +2,7 @@
  * Onde ficará todas as rotas
  */
 const express = require('express');
+const { celebrate, Segments, Joi } = require('celebrate');
 
 //importando os controller
 const OngController = require('./controllers/OngController');
@@ -29,19 +30,39 @@ routes.post('/session', SessionController.create);
  * Ongs
  */
 routes.get('/ongs', OngController.index)
-routes.post('/ongs', OngController.store);
+routes.post('/ongs', celebrate({
+    [Segments.BODY]: Joi.object().keys({
+        name: Joi.string().required(),
+        email: Joi.string().required().email(),
+        whatsapp: Joi.number().required().min(13),
+        city: Joi.string().required(),
+        uf: Joi.string().required().length(2)
+    })
+}), OngController.store);
 
 /**
  * Incidents
  */
-routes.get('/incidents', IncidentController.index)
+routes.get('/incidents', celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+        page: Joi.number()
+    })
+}), IncidentController.index)
 routes.post('/incidents', IncidentController.store);
-routes.delete('/incidents/:id', IncidentController.destroy);
+routes.delete('/incidents/:id', celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+        id: Joi.number().required()
+    })
+}), IncidentController.destroy);
 
 
 /**
  * Profile
  */
-routes.get('/profile', ProfileController.index);
+routes.get('/profile', celebrate({
+    [Segments.HEADERS]: Joi.object({
+        authorization: Joi.string().required()
+    }).unknown()
+}), ProfileController.index);
 
 module.exports = routes;
